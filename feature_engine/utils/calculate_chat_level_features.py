@@ -60,4 +60,24 @@ class ChatLevelFeaturesCalculator:
 		"""
 			This function is where your sentiment function will be called.
 		"""
-		self.chat_data["sentiment"] = self.chat_data["message"].apply(get_sentiment)
+		self.senti_model = sentiment_model()
+		print("Sentiment Model Loaded!")
+		df_scaled, df_combined = normalization(self.chat_data)
+		self.chat_data = clustering(df_scaled, df_combined)
+		# self.chat_data["sentiment"] = self.chat_data["message"].apply(lambda x: get_sentiment(self.senti_model, x))
+		self.chat_data["sentiment"] = self.chat_data.apply(
+        lambda row: get_sentiment(
+            self.senti_model, 
+            row["message"], 
+            row["cluster"], 
+        ),
+        axis=1
+    )
+	# def get_sentiment_features(self, model, row):
+	# 	chat_message = row["message"]
+	# 	efficiency = row["efficiency"]
+	# 	duration = row["duration"]
+	# 	score = row["score"]
+	# 	# Call the model for sentiment prediction
+	# 	sentiment = predict_sentiment_with_features(model, chat_message, efficiency, duration, score)
+	# 	return sentiment
